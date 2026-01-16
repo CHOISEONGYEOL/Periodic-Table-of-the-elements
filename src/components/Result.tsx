@@ -1,4 +1,4 @@
-import type { GameState, QuizCategory } from '../types';
+import type { GameState, QuizCategory, StudyTopic } from '../types';
 import { Leaderboard } from './Leaderboard';
 
 const categoryNames: Record<QuizCategory, string> = {
@@ -10,26 +10,20 @@ const categoryNames: Record<QuizCategory, string> = {
 
 interface ResultProps {
   gameState: GameState;
+  topic: StudyTopic;  // 분야 추가
   onRestart: () => void;
   onHome: () => void;
 }
 
-export const Result = ({ gameState, onRestart, onHome }: ResultProps) => {
+export const Result = ({ gameState, topic, onRestart, onHome }: ResultProps) => {
   const { mode, category, score, correctCount, wrongCount, maxCombo, hintsUsed } = gameState;
   const totalQuestions = correctCount + wrongCount;
   const accuracy = totalQuestions > 0
     ? Math.round((correctCount / totalQuestions) * 100)
     : 0;
 
-  const getGrade = () => {
-    if (accuracy >= 90) return { grade: 'S', color: '#ffd700', message: '완벽해요!' };
-    if (accuracy >= 80) return { grade: 'A', color: '#c0c0c0', message: '훌륭해요!' };
-    if (accuracy >= 70) return { grade: 'B', color: '#cd7f32', message: '잘했어요!' };
-    if (accuracy >= 60) return { grade: 'C', color: '#4a90d9', message: '괜찮아요!' };
-    return { grade: 'D', color: '#888', message: '더 연습해봐요!' };
-  };
-
-  const { grade, color, message } = getGrade();
+  // 전체 카테고리 + 스피드/서바이벌 모드일 때만 명예의 전당 표시
+  const showLeaderboard = category === 'all' && (mode === 'speed' || mode === 'survival');
 
   return (
     <div className="result">
@@ -41,16 +35,9 @@ export const Result = ({ gameState, onRestart, onHome }: ResultProps) => {
         </p>
       </div>
 
-      <div className="grade-section">
-        <div className="grade" style={{ color }}>
-          {grade}
-        </div>
-        <p className="grade-message">{message}</p>
-      </div>
-
       <div className="stats">
         <div className="stat-item main-stat">
-          <span className="stat-value">{score}</span>
+          <span className="stat-value">{score.toLocaleString()}</span>
           <span className="stat-label">총 점수</span>
         </div>
 
@@ -80,7 +67,9 @@ export const Result = ({ gameState, onRestart, onHome }: ResultProps) => {
         )}
       </div>
 
-      <Leaderboard mode={mode} category={category} />
+      {showLeaderboard && (
+        <Leaderboard topic={topic} mode={mode} currentNickname={gameState.nickname} />
+      )}
 
       <div className="result-actions">
         <button className="btn btn-primary" onClick={onRestart}>

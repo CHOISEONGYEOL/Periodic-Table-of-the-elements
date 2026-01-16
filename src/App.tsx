@@ -10,6 +10,7 @@ import { generateCoefficientQuestion, type CoefficientQuizQuestion } from './uti
 import type { CompoundCategory } from './data/compounds';
 import type { ReactionCategory, ChemicalReaction } from './data/reactions';
 import { getRandomReaction } from './data/reactions';
+import { saveScore } from './utils/storage';
 import type { MoleculeQuestion } from './data/moleculeQuestions';
 import { LandingPage } from './components/LandingPage';
 import { StartScreen, CategorySelect, QuestionCountSelect, FormulaCategorySelect, FormulaQuestionCountSelect, CoefficientCategorySelect, CoefficientQuestionCountSelect, MoleculeCategorySelect, MoleculeQuestionCountSelect } from './components/StartScreen';
@@ -24,12 +25,14 @@ import { CoefficientQuiz } from './components/CoefficientQuiz';
 import { CoefficientFlashCard } from './components/CoefficientFlashCard';
 import { MoleculeQuiz } from './components/MoleculeQuiz';
 import { MoleculeFlashCard } from './components/MoleculeFlashCard';
+import { NicknameInput } from './components/NicknameInput';
+import { Leaderboard } from './components/Leaderboard';
 import './App.css';
 
-type Screen = 'landing' | 'start' | 'category' | 'questionCount' | 'game' | 'test' | 'practice' | 'result' | 'testResult'
-  | 'formulaCategory' | 'formulaQuestionCount' | 'formulaGame' | 'formulaTest' | 'formulaPractice' | 'formulaResult' | 'formulaTestResult'
-  | 'coefficientCategory' | 'coefficientQuestionCount' | 'coefficientGame' | 'coefficientTest' | 'coefficientPractice' | 'coefficientResult' | 'coefficientTestResult'
-  | 'moleculeCategory' | 'moleculeQuestionCount' | 'moleculeGame' | 'moleculeTest' | 'moleculePractice' | 'moleculeResult' | 'moleculeTestResult';
+type Screen = 'landing' | 'start' | 'category' | 'questionCount' | 'nickname' | 'game' | 'test' | 'practice' | 'result' | 'testResult' | 'leaderboard'
+  | 'formulaCategory' | 'formulaQuestionCount' | 'formulaNickname' | 'formulaGame' | 'formulaTest' | 'formulaPractice' | 'formulaResult' | 'formulaTestResult'
+  | 'coefficientCategory' | 'coefficientQuestionCount' | 'coefficientNickname' | 'coefficientGame' | 'coefficientTest' | 'coefficientPractice' | 'coefficientResult' | 'coefficientTestResult'
+  | 'moleculeCategory' | 'moleculeQuestionCount' | 'moleculeNickname' | 'moleculeGame' | 'moleculeTest' | 'moleculePractice' | 'moleculeResult' | 'moleculeTestResult';
 
 const SPEED_MODE_TIME = 60;
 const TEST_QUESTION_TIME = 5;
@@ -94,6 +97,12 @@ function App() {
   const [moleculeWrongCount, setMoleculeWrongCount] = useState(0);
   const [moleculeCurrentQuestion, setMoleculeCurrentQuestion] = useState<MoleculeQuizQuestion | null>(null);
 
+  // 닉네임 상태 (명예의 전당용)
+  const [nickname, setNickname] = useState('');
+
+  // 명예의 전당 탭 상태
+  const [leaderboardTab, setLeaderboardTab] = useState<StudyTopic>('periodic-table');
+
   // 테마 상태
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const saved = localStorage.getItem('theme');
@@ -121,15 +130,66 @@ function App() {
   const { gameState, startGame, submitAnswer, nextQuestion, useHint, endGame, resetGame } = useGame();
   const { playSound } = useSound();
 
+  // 화학식 점수 저장 함수
+  const saveFormulaScore = useCallback(() => {
+    if (selectedFormulaCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival')) {
+      saveScore({
+        topic: 'formula-reading',
+        mode: selectedMode,
+        category: selectedFormulaCategory,
+        score: formulaScore,
+        correctCount: formulaCorrectCount,
+        maxCombo: formulaMaxCombo,
+        date: new Date().toISOString(),
+        nickname: nickname || 'AAA',
+      });
+    }
+  }, [selectedFormulaCategory, selectedMode, formulaScore, formulaCorrectCount, formulaMaxCombo, nickname]);
+
+  // 계수 점수 저장 함수
+  const saveCoefficientScore = useCallback(() => {
+    if (selectedCoefficientCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival')) {
+      saveScore({
+        topic: 'coefficient',
+        mode: selectedMode,
+        category: selectedCoefficientCategory,
+        score: coefficientScore,
+        correctCount: coefficientCorrectCount,
+        maxCombo: coefficientMaxCombo,
+        date: new Date().toISOString(),
+        nickname: nickname || 'AAA',
+      });
+    }
+  }, [selectedCoefficientCategory, selectedMode, coefficientScore, coefficientCorrectCount, coefficientMaxCombo, nickname]);
+
+  // 분자 점수 저장 함수
+  const saveMoleculeScore = useCallback(() => {
+    if (selectedMoleculeCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival')) {
+      saveScore({
+        topic: 'molecule',
+        mode: selectedMode,
+        category: selectedMoleculeCategory,
+        score: moleculeScore,
+        correctCount: moleculeCorrectCount,
+        maxCombo: moleculeMaxCombo,
+        date: new Date().toISOString(),
+        nickname: nickname || 'AAA',
+      });
+    }
+  }, [selectedMoleculeCategory, selectedMode, moleculeScore, moleculeCorrectCount, moleculeMaxCombo, nickname]);
+
   const handleTimeUp = useCallback(() => {
     // 화학식 읽기 스피드 모드인 경우
     if (selectedTopic === 'formula-reading') {
+      saveFormulaScore();
       playSound('gameOver');
       setScreen('formulaResult');
     } else if (selectedTopic === 'coefficient') {
+      saveCoefficientScore();
       playSound('gameOver');
       setScreen('coefficientResult');
     } else if (selectedTopic === 'molecule') {
+      saveMoleculeScore();
       playSound('gameOver');
       setScreen('moleculeResult');
     } else {
@@ -137,7 +197,7 @@ function App() {
       playSound('gameOver');
       setScreen('result');
     }
-  }, [endGame, playSound, selectedTopic]);
+  }, [endGame, playSound, selectedTopic, saveFormulaScore, saveCoefficientScore, saveMoleculeScore]);
 
   const { timeLeft, start: startTimer, reset: resetTimer } = useTimer(
     SPEED_MODE_TIME,
@@ -165,6 +225,17 @@ function App() {
     }
   };
 
+  // 명예의 전당 보기 - 현재 선택된 주제에 맞는 탭으로 이동
+  const handleViewLeaderboard = () => {
+    setLeaderboardTab(selectedTopic);
+    setScreen('leaderboard');
+  };
+
+  // 명예의 전당에서 뒤로가기
+  const handleLeaderboardBack = () => {
+    setScreen('start');
+  };
+
   // 카테고리 선택
   const handleSelectCategory = (category: QuizCategory) => {
     setSelectedCategory(category);
@@ -178,16 +249,27 @@ function App() {
       // TEST 모드: 문항수 선택 화면으로
       setScreen('questionCount');
     } else {
-      // 퀴즈 모드: 게임 시작
-      startGame(selectedMode, category);
-      setScreen('game');
-      setFeedback(null);
-
-      if (selectedMode === 'speed') {
-        resetTimer(SPEED_MODE_TIME);
-        startTimer();
-      }
+      // 스피드/서바이벌 모드: 닉네임 입력 화면으로
+      setScreen('nickname');
     }
+  };
+
+  // 닉네임 입력 후 게임 시작 (주기율표)
+  const handleNicknameSubmit = (inputNickname: string) => {
+    setNickname(inputNickname);
+    startGame(selectedMode, selectedCategory, inputNickname);
+    setScreen('game');
+    setFeedback(null);
+
+    if (selectedMode === 'speed') {
+      resetTimer(SPEED_MODE_TIME);
+      startTimer();
+    }
+  };
+
+  // 닉네임 화면에서 뒤로가기
+  const handleNicknameBack = () => {
+    setScreen('category');
   };
 
   // TEST 모드: 문항수 선택 -> 테스트 시작
@@ -339,9 +421,21 @@ function App() {
       // TEST 모드: 문항수 선택 화면으로
       setScreen('formulaQuestionCount');
     } else {
-      // 스피드/서바이벌 모드
-      startFormulaGame(compoundCategory);
+      // 스피드/서바이벌 모드: 닉네임 입력 화면으로
+      setScreen('formulaNickname');
     }
+  };
+
+  // 화학식 닉네임 입력 후 게임 시작
+  const handleFormulaNicknameSubmit = (inputNickname: string) => {
+    setNickname(inputNickname);
+    const compoundCategory = selectedFormulaCategory as CompoundCategory;
+    startFormulaGame(compoundCategory);
+  };
+
+  // 화학식 닉네임 화면에서 뒤로가기
+  const handleFormulaNicknameBack = () => {
+    setScreen('formulaCategory');
   };
 
   // 화학식 게임 시작
@@ -438,6 +532,7 @@ function App() {
 
       // 서바이벌 모드 게임오버 체크
       if (selectedMode === 'survival' && formulaLives <= 1 && !isCorrect) {
+        saveFormulaScore();
         playSound('gameOver');
         setScreen('formulaResult');
       } else {
@@ -524,9 +619,20 @@ function App() {
       // TEST 모드: 문항수 선택 화면으로
       setScreen('coefficientQuestionCount');
     } else {
-      // 스피드/서바이벌 모드
-      startCoefficientGame(category);
+      // 스피드/서바이벌 모드: 닉네임 입력 화면으로
+      setScreen('coefficientNickname');
     }
+  };
+
+  // 계수 닉네임 입력 후 게임 시작
+  const handleCoefficientNicknameSubmit = (inputNickname: string) => {
+    setNickname(inputNickname);
+    startCoefficientGame(selectedCoefficientCategory);
+  };
+
+  // 계수 닉네임 화면에서 뒤로가기
+  const handleCoefficientNicknameBack = () => {
+    setScreen('coefficientCategory');
   };
 
   // 계수 게임 시작 (5지선다)
@@ -621,6 +727,7 @@ function App() {
 
       // 서바이벌 모드 게임오버 체크
       if (selectedMode === 'survival' && coefficientLives <= 1 && !isCorrect) {
+        saveCoefficientScore();
         playSound('gameOver');
         setScreen('coefficientResult');
       } else {
@@ -704,9 +811,20 @@ function App() {
       // TEST 모드: 문항수 선택 화면으로
       setScreen('moleculeQuestionCount');
     } else {
-      // 스피드/서바이벌 모드
-      startMoleculeGame(category);
+      // 스피드/서바이벌 모드: 닉네임 입력 화면으로
+      setScreen('moleculeNickname');
     }
+  };
+
+  // 분자 닉네임 입력 후 게임 시작
+  const handleMoleculeNicknameSubmit = (inputNickname: string) => {
+    setNickname(inputNickname);
+    startMoleculeGame(selectedMoleculeCategory);
+  };
+
+  // 분자 닉네임 화면에서 뒤로가기
+  const handleMoleculeNicknameBack = () => {
+    setScreen('moleculeCategory');
   };
 
   // 분자 게임 시작
@@ -804,6 +922,7 @@ function App() {
 
       // 서바이벌 모드 게임오버 체크
       if (selectedMode === 'survival' && moleculeLives <= 1 && !isCorrect) {
+        saveMoleculeScore();
         playSound('gameOver');
         setScreen('moleculeResult');
       } else {
@@ -1043,7 +1162,59 @@ function App() {
             onBack={handleBackToLanding}
             isDarkMode={isDarkMode}
             onToggleTheme={handleToggleTheme}
+            onViewLeaderboard={handleViewLeaderboard}
           />
+        )}
+
+        {screen === 'leaderboard' && (
+          <div className="leaderboard-screen">
+            <button className="back-button" onClick={handleLeaderboardBack}>
+              ← 뒤로
+            </button>
+            <div className="leaderboard-header">
+              <h1>🏆 명예의 전당</h1>
+              <p className="leaderboard-subtitle">전체 문제 스피드/서바이벌 모드 기록</p>
+            </div>
+
+            {/* 분야 탭 */}
+            <div className="leaderboard-topic-tabs">
+              <button
+                className={`topic-tab ${leaderboardTab === 'periodic-table' ? 'active' : ''}`}
+                onClick={() => setLeaderboardTab('periodic-table')}
+              >
+                🧪 주기율표
+              </button>
+              <button
+                className={`topic-tab ${leaderboardTab === 'formula-reading' ? 'active' : ''}`}
+                onClick={() => setLeaderboardTab('formula-reading')}
+              >
+                📖 화학식 읽기
+              </button>
+              <button
+                className={`topic-tab ${leaderboardTab === 'coefficient' ? 'active' : ''}`}
+                onClick={() => setLeaderboardTab('coefficient')}
+              >
+                🔢 계수 맞추기
+              </button>
+              <button
+                className={`topic-tab ${leaderboardTab === 'molecule' ? 'active' : ''}`}
+                onClick={() => setLeaderboardTab('molecule')}
+              >
+                🧬 분자 맞추기
+              </button>
+            </div>
+
+            <div className="leaderboard-tabs">
+              <div className="leaderboard-section">
+                <h3>⚡ 스피드 모드</h3>
+                <Leaderboard topic={leaderboardTab} mode="speed" />
+              </div>
+              <div className="leaderboard-section">
+                <h3>❤️ 서바이벌 모드</h3>
+                <Leaderboard topic={leaderboardTab} mode="survival" />
+              </div>
+            </div>
+          </div>
         )}
 
         {screen === 'category' && (
@@ -1059,6 +1230,14 @@ function App() {
             category={selectedCategory}
             onSelectCount={handleSelectQuestionCount}
             onBack={handleBackToCategory}
+          />
+        )}
+
+        {screen === 'nickname' && (
+          <NicknameInput
+            onSubmit={handleNicknameSubmit}
+            onBack={handleNicknameBack}
+            mode={selectedMode}
           />
         )}
 
@@ -1150,6 +1329,7 @@ function App() {
         {screen === 'result' && (
           <Result
             gameState={gameState}
+            topic="periodic-table"
             onRestart={handleRestart}
             onHome={handleHome}
           />
@@ -1234,6 +1414,14 @@ function App() {
             onNext={handleNextFormulaCard}
             onBack={handleFormulaPracticeBack}
             cardNumber={formulaPracticeCardNumber}
+          />
+        )}
+
+        {screen === 'formulaNickname' && (
+          <NicknameInput
+            onSubmit={handleFormulaNicknameSubmit}
+            onBack={handleFormulaNicknameBack}
+            mode={selectedMode}
           />
         )}
 
@@ -1385,6 +1573,10 @@ function App() {
               </div>
             </div>
 
+            {selectedFormulaCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival') && (
+              <Leaderboard topic="formula-reading" mode={selectedMode} currentNickname={nickname} />
+            )}
+
             <div className="result-actions">
               <button className="btn btn-primary" onClick={handleFormulaRestart}>
                 다시 하기
@@ -1475,6 +1667,14 @@ function App() {
             onNext={handleNextCoefficientCard}
             onBack={handleCoefficientPracticeBack}
             cardNumber={coefficientPracticeNumber}
+          />
+        )}
+
+        {screen === 'coefficientNickname' && (
+          <NicknameInput
+            onSubmit={handleCoefficientNicknameSubmit}
+            onBack={handleCoefficientNicknameBack}
+            mode={selectedMode}
           />
         )}
 
@@ -1593,6 +1793,10 @@ function App() {
               </div>
             </div>
 
+            {selectedCoefficientCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival') && (
+              <Leaderboard topic="coefficient" mode={selectedMode} currentNickname={nickname} />
+            )}
+
             <div className="result-actions">
               <button className="btn btn-primary" onClick={handleCoefficientRestart}>
                 다시 하기
@@ -1686,6 +1890,14 @@ function App() {
           />
         )}
 
+        {screen === 'moleculeNickname' && (
+          <NicknameInput
+            onSubmit={handleMoleculeNicknameSubmit}
+            onBack={handleMoleculeNicknameBack}
+            mode={selectedMode}
+          />
+        )}
+
         {screen === 'moleculeGame' && moleculeCurrentQuestion && (
           <MoleculeQuiz
             question={moleculeCurrentQuestion}
@@ -1750,6 +1962,10 @@ function App() {
                 </div>
               </div>
             </div>
+
+            {selectedMoleculeCategory === 'all' && (selectedMode === 'speed' || selectedMode === 'survival') && (
+              <Leaderboard topic="molecule" mode={selectedMode} currentNickname={nickname} />
+            )}
 
             <div className="result-actions">
               <button className="btn btn-primary" onClick={handleMoleculeRestart}>

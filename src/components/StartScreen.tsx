@@ -31,9 +31,10 @@ interface StartScreenProps {
   onBack: () => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
+  onViewLeaderboard: () => void;
 }
 
-export const StartScreen = ({ topic, onSelectMode, onBack, isDarkMode, onToggleTheme }: StartScreenProps) => {
+export const StartScreen = ({ topic, onSelectMode, onBack, isDarkMode, onToggleTheme, onViewLeaderboard }: StartScreenProps) => {
   const info = topicInfo[topic];
 
   return (
@@ -89,6 +90,16 @@ export const StartScreen = ({ topic, onSelectMode, onBack, isDarkMode, onToggleT
           <ul>
             <li>문항당 5초 제한</li>
             <li>100점 만점 환산</li>
+          </ul>
+        </div>
+
+        <div className="mode-card leaderboard-card" onClick={onViewLeaderboard}>
+          <div className="mode-icon">🏆</div>
+          <h2>명예의 전당</h2>
+          <p>최고 기록을 확인하세요</p>
+          <ul>
+            <li>전체 문제 스피드/서바이벌</li>
+            <li>역대 기록 랭킹</li>
           </ul>
         </div>
       </div>

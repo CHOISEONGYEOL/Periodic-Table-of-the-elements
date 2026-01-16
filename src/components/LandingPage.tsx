@@ -19,11 +19,11 @@ const topics: TopicInfo[] = [
     available: true,
   },
   {
-    id: 'molecule',
-    icon: '🧪',
-    title: '화학 반응식 분자 맞추기',
-    subtitle: '반응물 · 생성물 분자 이름',
-    description: '화학 반응식에서 분자를 맞춰보세요',
+    id: 'formula-reading',
+    icon: '📖',
+    title: '화학식 읽기',
+    subtitle: '화학식 ↔ 이름 변환',
+    description: '화학식을 읽고 이름을 맞춰보세요',
     available: true,
   },
   {
@@ -35,11 +35,11 @@ const topics: TopicInfo[] = [
     available: true,
   },
   {
-    id: 'formula-reading',
-    icon: '📖',
-    title: '화학식 읽기',
-    subtitle: '화학식 ↔ 이름 변환',
-    description: '화학식을 읽고 이름을 맞춰보세요',
+    id: 'molecule',
+    icon: '🧪',
+    title: '화학 반응식 분자 맞추기',
+    subtitle: '반응물 · 생성물 분자 이름',
+    description: '화학 반응식에서 분자를 맞춰보세요',
     available: true,
   },
 ];

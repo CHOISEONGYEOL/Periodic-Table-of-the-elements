@@ -8,7 +8,7 @@ const COMBO_MULTIPLIER = 0.5;
 const BASE_SCORE = 100;
 const HINT_PENALTY = 0.5;
 
-const createInitialState = (mode: GameMode, category: QuizCategory): GameState => ({
+const createInitialState = (mode: GameMode, category: QuizCategory, nickname: string = ''): GameState => ({
   mode,
   category,
   score: 0,
@@ -22,27 +22,33 @@ const createInitialState = (mode: GameMode, category: QuizCategory): GameState =
   hintsUsed: 0,
   isGameOver: false,
   isPaused: false,
+  nickname,
 });
 
 interface UseGameReturn {
   gameState: GameState;
-  startGame: (mode: GameMode, category: QuizCategory) => void;
+  startGame: (mode: GameMode, category: QuizCategory, nickname?: string) => void;
   submitAnswer: (answer: string) => { isCorrect: boolean; isCombo: boolean };
   nextQuestion: () => void;
   useHint: () => string | null;
   endGame: () => void;
   resetGame: () => void;
+  setNickname: (nickname: string) => void;
 }
 
 export const useGame = (): UseGameReturn => {
   const [gameState, setGameState] = useState<GameState>(createInitialState('speed', 'all'));
   const [hintUsedForCurrentQuestion, setHintUsedForCurrentQuestion] = useState(false);
 
-  const startGame = useCallback((mode: GameMode, category: QuizCategory) => {
-    const newState = createInitialState(mode, category);
+  const startGame = useCallback((mode: GameMode, category: QuizCategory, nickname: string = '') => {
+    const newState = createInitialState(mode, category, nickname);
     newState.currentQuestion = generateQuestion(category);
     setGameState(newState);
     setHintUsedForCurrentQuestion(false);
+  }, []);
+
+  const setNickname = useCallback((nickname: string) => {
+    setGameState(prev => ({ ...prev, nickname }));
   }, []);
 
   const nextQuestion = useCallback(() => {
@@ -112,14 +118,16 @@ export const useGame = (): UseGameReturn => {
 
   const endGame = useCallback(() => {
     setGameState(prev => {
-      // 리더보드에 저장
+      // 리더보드에 저장 (닉네임 포함) - 주기율표 분야
       saveScore({
+        topic: 'periodic-table',
         mode: prev.mode,
         category: prev.category,
         score: prev.score,
         correctCount: prev.correctCount,
         maxCombo: prev.maxCombo,
         date: new Date().toISOString(),
+        nickname: prev.nickname || 'AAA',  // 닉네임 없으면 오락실 스타일 기본값
       });
 
       return {
@@ -142,5 +150,6 @@ export const useGame = (): UseGameReturn => {
     useHint,
     endGame,
     resetGame,
+    setNickname,
   };
 };

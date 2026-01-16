@@ -55,6 +55,7 @@ body {
 .container {
   width: 100%;
   max-width: 900px;
+  margin: 0 auto;
 }
 
 /* 시작 화면 */
@@ -80,7 +81,7 @@ body {
 
 .mode-selection {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -757,6 +758,7 @@ body {
 
 .start-screen {
   position: relative;
+  text-align: center;
 }
 
 /* 선택된 모드 표시 */
@@ -774,7 +776,10 @@ body {
 /* 카테고리 선택 */
 .category-selection {
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .category-card {
@@ -970,24 +975,6 @@ body {
   font-size: 0.8rem;
 }
 
-/* 연습 모드 카드 스타일 */
-.practice-card {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-}
-
-.practice-card:hover {
-  border-color: #0ea5e9;
-}
-
-/* TEST 모드 카드 스타일 */
-.test-card {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-}
-
-.test-card:hover {
-  border-color: #f59e0b;
-}
-
 /* 문항수 선택 */
 .selected-category {
   display: inline-block;
@@ -1166,6 +1153,12 @@ body {
   }
 }
 
+@media (max-width: 1100px) {
+  .mode-selection {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   .mode-selection {
     grid-template-columns: repeat(2, 1fr);
@@ -1210,13 +1203,6 @@ body {
 }
 
 /* 다크모드에서 특정 요소 조정 */
-[data-theme="dark"] .practice-card {
-  background: linear-gradient(135deg, #1e3a5f 0%, #1e40af 100%);
-}
-
-[data-theme="dark"] .test-card {
-  background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
-}
 
 [data-theme="dark"] .flashcard-front {
   background: var(--surface);
@@ -1981,4 +1967,412 @@ body {
   .unbalanced-reaction {
     font-size: 1rem;
   }
+}
+
+/* ============================================
+   닉네임 입력 화면 (오락실 스타일)
+   ============================================ */
+.nickname-screen {
+  text-align: center;
+  padding: 2rem;
+}
+
+.nickname-header {
+  margin-bottom: 2rem;
+}
+
+.nickname-header h1 {
+  font-size: 2rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.nickname-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.nickname-form {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.nickname-input-wrapper {
+  margin-bottom: 1.5rem;
+}
+
+.nickname-input {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 3px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.nickname-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.nickname-input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.nickname-limit {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.nickname-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.nickname-actions .btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+}
+
+.nickname-mode-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  margin-top: 1.5rem;
+}
+
+.nickname-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.nickname-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.nickname-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.nickname-mode {
+  color: var(--primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.nickname-hint {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.nickname-submit {
+  width: 100%;
+}
+
+.nickname-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nickname-shortcuts {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+/* ============================================
+   명예의 전당 (Hall of Fame)
+   ============================================ */
+.hall-of-fame {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border: 2px solid var(--border);
+}
+
+.hall-title {
+  text-align: center;
+  font-size: 1.5rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.hall-empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.hall-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hall-entry {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--background);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.hall-entry.top-3 {
+  background: linear-gradient(135deg, var(--surface), var(--background));
+  border: 1px solid var(--primary);
+}
+
+.hall-entry.current-player {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.15), rgba(37, 99, 235, 0.05));
+  border: 2px solid var(--primary);
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(37, 99, 235, 0); }
+}
+
+.hall-rank {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.hall-nickname {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hall-score {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary);
+  text-align: right;
+}
+
+.hall-date {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.hall-expand-btn {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hall-expand-btn:hover {
+  background: var(--background);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.hall-rest {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.hall-rest::-webkit-scrollbar {
+  width: 6px;
+}
+
+.hall-rest::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 3px;
+}
+
+.hall-rest::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.hall-rest::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* 다크 모드 명예의 전당 */
+[data-theme="dark"] .hall-entry.top-3 {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);
+}
+
+[data-theme="dark"] .hall-entry.current-player {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1));
+}
+
+/* 반응형 명예의 전당 */
+@media (max-width: 600px) {
+  .hall-entry {
+    grid-template-columns: 2rem 1fr auto;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .hall-date {
+    display: none;
+  }
+
+  .hall-nickname {
+    font-size: 0.9rem;
+  }
+
+  .hall-score {
+    font-size: 0.85rem;
+  }
+
+  .nickname-input {
+    font-size: 1.25rem;
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* ============================================
+   명예의 전당 전용 화면
+   ============================================ */
+.leaderboard-screen {
+  text-align: center;
+  padding: 1rem;
+}
+
+.leaderboard-header {
+  margin-bottom: 2rem;
+}
+
+.leaderboard-header h1 {
+  font-size: 2rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.leaderboard-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+/* 분야 탭 */
+.leaderboard-topic-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.topic-tab {
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.topic-tab:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.topic-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.leaderboard-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.leaderboard-section {
+  text-align: left;
+}
+
+.leaderboard-section h3 {
+  font-size: 1.25rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-tabs {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* 명예의 전당 모드 카드 */
+.mode-card.leaderboard-card {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+}
+
+.mode-card.leaderboard-card:hover {
+  border-color: #d97706;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+}
+
+[data-theme="dark"] .mode-card.leaderboard-card {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.15) 100%);
+  border-color: #f59e0b;
+}
+
+[data-theme="dark"] .mode-card.leaderboard-card:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
 }

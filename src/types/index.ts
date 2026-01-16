@@ -54,16 +54,19 @@ export interface GameState {
   hintsUsed: number;
   isGameOver: boolean;
   isPaused: boolean;
+  nickname: string;  // 명예의 전당용 닉네임
   // 테스트 모드용
   totalQuestions?: number;
   currentQuestionIndex?: number;
 }
 
 export interface LeaderboardEntry {
+  topic: StudyTopic;  // 분야 (주기율표, 화학식, 계수, 분자)
   mode: GameMode;
-  category: QuizCategory;
+  category: QuizCategory | string;  // 각 분야별 카테고리
   score: number;
   correctCount: number;
   maxCombo: number;
   date: string;
+  nickname: string;  // 명예의 전당용 닉네임
 }
